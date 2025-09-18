@@ -37,14 +37,44 @@ TreeNode * createTreeNode(void* key, void * value) {
 }
 
 TreeMap * createTreeMap(int (*lower_than) (void* key1, void* key2)) {
+    TreeMap* mapa = (TreeMap*) malloc (sizeof(TreeMap));
+    if (mapa == NULL) return NULL;
 
-    //new->lower_than = lower_than;
-    return NULL;
+    mapa->root = NULL;
+    mapa->current = NULL;
+    mapa->lower_than = lower_than;
+    return mapa;
 }
 
 
 void insertTreeMap(TreeMap * tree, void* key, void * value) {
+    if (tree->root == NULL) {
+        tree->root = createTreeNode(key, value);
+        tree->current = tree->root;
+        return;
+    }
 
+    TreeNode* aux = tree->root;
+    TreeNode* parent = NULL;
+
+    while (aux != NULL){
+        if (is_equal(tree, key, aux->pair->key)) return;
+        parent = aux;
+        if (tree->lower_than(key, aux->pair->key))
+            aux = aux->left;
+        else
+            aux = aux->right;
+    }
+
+    TreeNode* newNode = createTreeNode(key, value);
+    newNode->parent = parent;
+
+    if (tree->lower_than(key, parent->pair->key))
+        parent->left = newNode;
+    else
+        parent->right = newNode;
+
+    tree->current = newNode;    
 }
 
 TreeNode * minimum(TreeNode * x){
